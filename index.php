@@ -1,3 +1,8 @@
+<?php
+// Kalau sudah ada header.php dan footer.php, bisa gunakan include di sini
+// include 'pages/header.php';
+?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -21,18 +26,17 @@
     <img src="Assets/logo rumahsambalseruit.jpeg" alt="Logo kanan">
   </div>
 </header>
-         <nav>
-            <ul>
-              <li><a href="index.html"></a></li>
-               <li><a href="login.html">Login</a></li>
-              <li><a href="pages/menu.html">Menu</a></li>
-              <li><a href="pages/info/about.html">About</a></li>
-              <li><a href="pages/contact.html">kontak</a></li>
-              
-            </ul>
-        </nav>
-    <footer>
-        2025 Rumah sambal seruit.
-    </footer>
+<nav>
+    <ul>
+        <li><a href="index.php">Home</a></li>
+        <li><a href="admin_login/pages/login.php">Login</a></li>
+        <li><a href="pages/menu.php">Menu</a></li>
+        <li><a href="pages/info/about.php">About</a></li>
+        <li><a href="pages/info/contact.php">Kontak</a></li>
+    </ul>
+</nav>
+<footer>
+    2025 Rumah sambal seruit.
+</footer>
 </body>
 </html>

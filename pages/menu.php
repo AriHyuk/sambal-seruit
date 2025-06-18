@@ -1,3 +1,28 @@
+<?php
+include '../admin_login/config/koneksi.php'; // Sesuaikan path jika file ada di folder lain
+
+// Ambil semua menu, urutkan berdasarkan kategori lalu id
+$result = mysqli_query($conn, "SELECT * FROM menu ORDER BY kategori, id DESC");
+
+// Kelompokkan menu per kategori
+$kategori_data = [];
+while ($row = mysqli_fetch_assoc($result)) {
+    $kategori_data[$row['kategori']][] = $row;
+}
+
+// Daftar kategori yang ingin ditampilkan urutannya
+$daftar_kategori = [
+    'ayam' => 'MENU AYAM',
+    'bebek' => 'MENU BEBEK',
+    'kuah' => 'MENU KUAH',
+    'ikan' => 'MENU IKAN',
+    'ikan asin' => 'MENU IKAN ASIN',
+    'sate' => 'MENU SATE',
+    'minuman' => 'MINUMAN',
+    'sayur' => 'MENU SAYUR',
+    'tambahan' => 'MENU TAMBAHAN'
+];
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -44,7 +69,7 @@
         }
         .menu-img {
             width: 100%;
-            height: 800px;
+            height: 180px;
             object-fit: cover;
         }
         .menu-item h4 {
@@ -59,97 +84,36 @@
     </style>
 </head>
 <body>
-    <header>
-        <h2>MENU MENU RUMAH SAMBAL SERUIT</h2>
-    </header>
-    <div class="content">
-        <div class="menu-list">
-            <div class="menu-item">
-                <img src="../assets/menu ayam.jpg" alt="MENU AYAM" class="menu-img">
-                <h4>MENU AYAM</h4>
+    <?php foreach ($daftar_kategori as $kategori => $judul): ?>
+        <?php if (!empty($kategori_data[$kategori])): ?>
+            <header>
+                <h2><?= htmlspecialchars($judul) ?></h2>
+            </header>
+            <div class="content">
+                <div class="menu-list">
+                    <?php foreach ($kategori_data[$kategori] as $menu): ?>
+                        <div class="menu-item">
+                            <img src="../admin_login/Assets/menu/<?= htmlspecialchars($menu['gambar']) ?>" alt="<?= htmlspecialchars($menu['nama_menu']) ?>" class="menu-img">
+                            <h4><?= htmlspecialchars($menu['nama_menu']) ?></h4>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
             </div>
-            <div class="menu-item">
-                <img src="../assets/ayam.jpg" alt="MENU AYAM" class="menu-img">
-                <h4>MENU AYAM</h4>
-            </div>
-        </div>
+        <?php endif; ?>
+    <?php endforeach; ?>
+
+    <div style="text-align:center; margin:20px 0;">
+      <button onclick="history.back()" style="
+        padding: 10px 20px;
+        background-color: #ff0808;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+      " onmouseover="this.style.background='#a11d1d'" onmouseout="this.style.background='#B22222'">
+        Kembali
+      </button>
     </div>
-<header>
-</header>
-<div class="content">
-    <div class="menu-list">
-        <div class="menu-item">
-            <img src="../Assets/menu bebek.jpg" alt="MENU BEBEK" class="menu-img">
-            <H4>MENU BEBEK</H4>
-        </div>
-        <div class="menu-item">
-                <img src="../Assets/menu kuah.jpg" alt="MENU AYAM" class="menu-img">
-                <h4>MENU KUAH</h4>
-            </div>
-    </div>
-</div>
-<header>
-</header>
-<div class="content">
-    <div class="menu-list">
-        <div class="menu-item">
-            <img src="../Assets/menu ikan.jpg" alt="MENU IKAN" class="menu-img">
-            <h4>MENU IKAN</h4>
-        </div>
-        <div class="menu-item">
-            <img src="../Assets/ikan.jpg" alt="MENU IKAN" class="menu-img">
-            <h4>MENU IKAN</h4>
-    </div>
-</div>
-<header>
-</header>
-<div class="content">
-    <div class="menu-list">
-        <div class="menu-item">
-            <img src="../Assets/ikan asin.jpg" alt="MENU IKAN ASIN" class="menu-img">
-            <h4>MENU IKAN ASIN</h4>
-        </div>
-        <div class="menu-item">
-            <img src="../Assets/menu sate.jpg" alt="MENU SATE" class="menu-img">
-            <h4>MENU SATE</h4>
-    </div>
-</div>
-<header>
-</header>
-<div class="content">
-    <div class="menu-list">
-        <div class="menu-item">
-            <img src="../Assets/menu minuman.jpg" alt="MINUMAN" class="menu-img">
-            <h4>MINUMAN</h4>
-        </div>
-        <div class="menu-item">
-            <img src="../Assets/menu sayur.jpg" alt="MENU SAYUR" class="menu-img">
-            <h4>MENU SAYU</h4>
-    </div>
-</div>
-<header>
-     <h2>ANEKA MENU TAMBAHAN</h2>
-</header>
-<div class="content">
-    <div class="menu-list">
-        <div class="menu-item">
-            <img src="../Assets/menu tambahan.jpg" style="width: 1000px; height: auto; object-fit: cover; border-radius: 10px;">
-            <h4>MENU TAMBAHAN</h4>
-        </div>
-</div>
-<div style="text-align:center; margin:20px 0;">
-  <button onclick="history.back()" style="
-    padding: 10px 20px;
-    background-color: #ff0808;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-weight: bold;
-    cursor: pointer;
-  " onmouseover="this.style.background='#a11d1d'" onmouseout="this.style.background='#B22222'">
-    Kembali
-  </button>
-</div>
-</div>
 </body>
 </html>
