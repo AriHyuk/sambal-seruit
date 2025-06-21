@@ -3,7 +3,13 @@
 include '../config/koneksi.php';
 
 // Ambil semua data menu
-$menus = mysqli_query($conn, "SELECT * FROM menu ORDER BY kategori, urutan, id");
+$menus = mysqli_query($conn, "
+    SELECT m.*, k.nama_kategori 
+    FROM menu m
+    JOIN kategori_menu k ON m.kategori = k.id
+    ORDER BY m.kategori, m.urutan, m.id
+");
+
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -35,7 +41,7 @@ $menus = mysqli_query($conn, "SELECT * FROM menu ORDER BY kategori, urutan, id")
       <tr>
         <td><?= $no++ ?></td>
         <td><?= htmlspecialchars($row['nama_menu']) ?></td>
-        <td><?= htmlspecialchars(ucwords($row['kategori'])) ?></td>
+        <td><?= htmlspecialchars(ucwords($row['nama_kategori'])) ?></td>
         <td>
           <?php if($row['gambar']): ?>
             <img src="../Assets/menu/<?= $row['gambar'] ?>" class="menu-img">

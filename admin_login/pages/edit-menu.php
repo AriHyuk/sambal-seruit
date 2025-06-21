@@ -7,7 +7,7 @@ if (!$data) { header("Location: dashboard-menu.php"); exit; }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $nama = $_POST['nama_menu'];
-  $kategori = $_POST['kategori'];
+  $kategori = intval($_POST['kategori']); // ambil ID, bukan nama!
   $gambar = $data['gambar'];
   if ($_FILES['gambar']['name']) {
     $gambar = uniqid() . '-' . $_FILES['gambar']['name'];
@@ -34,20 +34,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <input type="text" name="nama_menu" class="form-control" value="<?= htmlspecialchars($data['nama_menu']) ?>" required>
     </div>
     <div class="mb-3">
+      <label>Kategori</label>
       <?php
-// Ambil kategori dari database
-$kategori_query = mysqli_query($conn, "SELECT * FROM kategori_menu");
-?>
-
-<select name="kategori" class="form-control" required>
-  <option value="">-- Pilih Kategori --</option>
-  <?php while ($kat = mysqli_fetch_assoc($kategori_query)): ?>
-    <option value="<?= htmlspecialchars($kat['nama_kategori']) ?>"
-      <?= isset($row['kategori']) && $row['kategori'] == $kat['nama_kategori'] ? 'selected' : '' ?>>
-      <?= htmlspecialchars($kat['nama_kategori']) ?>
-    </option>
-  <?php endwhile; ?>
-</select>
+      $kategori_query = mysqli_query($conn, "SELECT * FROM kategori_menu");
+      ?>
+      <select name="kategori" class="form-control" required>
+        <option value="">-- Pilih Kategori --</option>
+        <?php while ($kat = mysqli_fetch_assoc($kategori_query)): ?>
+          <option value="<?= $kat['id'] ?>"
+            <?= $data['kategori'] == $kat['id'] ? 'selected' : '' ?>>
+            <?= htmlspecialchars($kat['nama_kategori']) ?>
+          </option>
+        <?php endwhile; ?>
+      </select>
     </div>
     <div class="mb-3">
       <label>Gambar (biarkan kosong jika tidak diganti)</label><br>

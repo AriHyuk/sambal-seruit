@@ -201,7 +201,7 @@ $totalKategori = $dataKategori['total'] ?? 0;
     </div>
     
     <div class="sidebar-menu">
-      <a href="index.php" class="menu-item active">
+      <a href="../../index.php" class="menu-item active">
         <i class="bi bi-speedometer2"></i> Dashboard
       </a>
       <a href="dashboard-menu.php" class="menu-item">
@@ -212,6 +212,9 @@ $totalKategori = $dataKategori['total'] ?? 0;
       </a>
         <a href="dashboard-kategori.php" class="menu-item">
         <i class="bi bi-images"></i> Kelola Kategori
+      </a>
+      <a href="dashboard-prinsip.php" class="menu-item">
+        <i class="bi bi-gear"></i> Kelola Prinsip
       </a>
       <a href="../proses/logout.php" class="menu-item">
         <i class="bi bi-box-arrow-right"></i> Logout
@@ -269,13 +272,23 @@ $totalKategori = $dataKategori['total'] ?? 0;
           </div>
         </div>
 
-                <div class="col-md-6 col-lg-3">
+        <div class="col-md-6 col-lg-3">
           <div class="stats-card">
             <div class="icon">
               <i class="bi bi-images"></i>
             </div>
             <div class="count"><?= $totalKategori ?></div>
             <div class="label">Kategori</div>
+          </div>
+        </div>
+              
+        <div class="col-md-6 col-lg-3">
+          <div class="stats-card">
+            <div class="icon">
+              <i class="bi bi-images"></i>
+            </div>
+            <div class="count"></div>
+            <div class="label">Prinsip</div>
           </div>
         </div>
         

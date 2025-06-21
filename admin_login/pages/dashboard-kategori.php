@@ -49,6 +49,7 @@ $kategori_result = mysqli_query($conn, "
             <?php endwhile; ?>
         </tbody>
     </table>
+      <a href="dashboard-admin.php" class="btn btn-secondary mt-3">Kembali ke Dashboard</a>
 </div>
 </body>
 </html>

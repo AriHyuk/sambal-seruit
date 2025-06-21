@@ -1,28 +1,30 @@
 <?php
 include '../admin_login/config/koneksi.php';
 
-// Ambil semua menu, urutkan berdasarkan kategori lalu id
-$result = mysqli_query($conn, "SELECT * FROM menu ORDER BY kategori, id DESC");
-
-// Kelompokkan menu per kategori
-$kategori_data = [];
-while ($row = mysqli_fetch_assoc($result)) {
-    $kategori_data[$row['kategori']][] = $row;
+// Get all categories from database
+$kategori_result = mysqli_query($conn, "SELECT * FROM kategori_menu");
+$daftar_kategori = [];
+while ($row = mysqli_fetch_assoc($kategori_result)) {
+    $daftar_kategori[$row['id']] = $row['nama_kategori'];
 }
 
-// Daftar kategori dan label tampilan
-$daftar_kategori = [
-    'ayam' => 'Menu Ayam',
-    'bebek' => 'Menu Bebek',
-    'kuah' => 'Menu Kuah',
-    'ikan' => 'Menu Ikan',
-    'ikan asin' => 'Menu Ikan Asin',
-    'sate' => 'Menu Sate',
-    'minuman' => 'Minuman',
-    'sayur' => 'Menu Sayur',
-    'tambahan' => 'Menu Tambahan'
-];
+// Get all menu items, ordered by category then id
+$result = mysqli_query($conn, "SELECT m.*, km.nama_kategori 
+                              FROM menu m
+                              JOIN kategori_menu km ON m.kategori = km.id
+                              ORDER BY m.kategori, m.id DESC");
+
+// Group menu items by category
+$kategori_data = [];
+while ($row = mysqli_fetch_assoc($result)) {
+    $kategori_data[$row['kategori']]['nama'] = $row['nama_kategori'];
+    $kategori_data[$row['kategori']]['items'][] = $row;
+}
+
+// Check if a specific category filter is set
+$active_filter = isset($_GET['kategori']) ? intval($_GET['kategori']) : null;
 ?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -35,7 +37,7 @@ $daftar_kategori = [
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <style>
         :root {
-            --primary: #e63946; /* Modern red */
+            --primary: #e63946;
             --primary-dark: #c1121f;
             --secondary: #f8f9fa;
             --dark: #212529;
@@ -95,6 +97,39 @@ $daftar_kategori = [
             opacity: 0.9;
             max-width: 700px;
             margin: 0 auto;
+        }
+
+        /* Category Filter */
+        .category-filter {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.75rem;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .filter-btn {
+            background-color: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            padding: 0.5rem 1.5rem;
+            font-weight: 600;
+            border-radius: 50px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background-color: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .filter-btn.active {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
         }
 
         /* Category Section */
@@ -215,6 +250,31 @@ $daftar_kategori = [
             border-top: 1px dashed var(--light-gray);
         }
 
+        /* Show More/Less Button */
+        .show-more-btn {
+            background-color: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            padding: 0.5rem 1.5rem;
+            font-weight: 600;
+            border-radius: 50px;
+            transition: var(--transition);
+            margin: 1rem auto;
+            display: block;
+        }
+
+        .show-more-btn:hover {
+            background-color: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Hidden items */
+        .menu-item.hidden {
+            display: none;
+        }
+
         /* Back Button */
         .back-btn {
             background-color: var(--primary);
@@ -310,29 +370,81 @@ $daftar_kategori = [
         </div>
     </section>
 
+    <!-- Category Filter -->
+    <div class="category-filter">
+        <button class="filter-btn <?= is_null($active_filter) ? 'active' : '' ?>" 
+                onclick="window.location.href='?'">
+            Semua Menu
+        </button>
+        <?php foreach ($daftar_kategori as $id => $nama): ?>
+            <button class="filter-btn <?= $active_filter == $id ? 'active' : '' ?>" 
+                    onclick="window.location.href='?kategori=<?= $id ?>'">
+                <?= htmlspecialchars($nama) ?>
+            </button>
+        <?php endforeach; ?>
+    </div>
+
     <!-- Menu Sections -->
     <main class="container category-section">
-        <?php foreach ($daftar_kategori as $kategori => $judul): ?>
-            <?php if (!empty($kategori_data[$kategori])): ?>
-                <div class="text-center">
-                    <h2 class="category-title animate__animated animate__fadeIn"><?= htmlspecialchars($judul) ?></h2>
-                </div>
+        <?php foreach ($kategori_data as $kategori_id => $data): ?>
+            <?php 
+                // Skip if we have an active filter and this isn't the filtered category
+                if (!is_null($active_filter) && $active_filter != $kategori_id) continue;
                 
-                <div class="row">
-                    <?php foreach ($kategori_data[$kategori] as $index => $menu): ?>
-                        <div class="col-12 col-sm-6 col-md-4 col-lg-3 animate__animated animate__fadeInUp animate__delay-<?= ($index % 4) + 1 ?>s">
+                $items = $data['items'];
+                $show_more = count($items) > 8;
+                $display_items = $show_more ? array_slice($items, 0, 8) : $items;
+            ?>
+            
+            <div class="text-center">
+                <h2 class="category-title animate__animated animate__fadeIn"><?= htmlspecialchars($data['nama']) ?></h2>
+            </div>
+            
+            <div class="row">
+                <?php foreach ($display_items as $index => $menu): ?>
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3 animate__animated animate__fadeInUp animate__delay-<?= ($index % 4) + 1 ?>s menu-item">
+                        <div class="card menu-card">
+                            <div class="menu-img-container">
+                                <img src="../admin_login/Assets/menu/<?= htmlspecialchars($menu['gambar']) ?>" 
+                                     class="menu-img"
+                                     alt="<?= htmlspecialchars($menu['nama_menu']) ?>"
+                                     loading="lazy"
+                                     style="cursor: pointer;"
+                                     data-bs-toggle="modal"
+                                     data-bs-target="#imageModal"
+                                     onclick="showImageModal(this)">
+                                <span class="menu-badge"><?= htmlspecialchars($data['nama']) ?></span>
+                            </div>
+                            <div class="card-body">
+                                <h3 class="menu-title"><?= htmlspecialchars($menu['nama_menu']) ?></h3>
+                                <?php if (!empty($menu['deskripsi'])): ?>
+                                    <p class="menu-description"><?= htmlspecialchars($menu['deskripsi']) ?></p>
+                                <?php endif; ?>
+                                <?php if (!empty($menu['harga'])): ?>
+                                    <div class="menu-price">
+                                        <span>Harga</span>
+                                        <span>Rp<?= number_format($menu['harga'], 0, ',', '.') ?></span>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+                
+                <?php if ($show_more): ?>
+                    <?php foreach (array_slice($items, 8) as $index => $menu): ?>
+                        <div class="col-12 col-sm-6 col-md-4 col-lg-3 animate__animated animate__fadeInUp animate__delay-<?= ($index % 4) + 1 ?>s menu-item hidden">
                             <div class="card menu-card">
                                 <div class="menu-img-container">
                                     <img src="../admin_login/Assets/menu/<?= htmlspecialchars($menu['gambar']) ?>" 
-     class="menu-img"
-     alt="<?= htmlspecialchars($menu['nama_menu']) ?>"
-     loading="lazy"
-     style="cursor: pointer;"
-     data-bs-toggle="modal"
-     data-bs-target="#imageModal"
-     onclick="showImageModal(this)">
-
-                                    <span class="menu-badge"><?= htmlspecialchars($judul) ?></span>
+                                         class="menu-img"
+                                         alt="<?= htmlspecialchars($menu['nama_menu']) ?>"
+                                         loading="lazy"
+                                         style="cursor: pointer;"
+                                         data-bs-toggle="modal"
+                                         data-bs-target="#imageModal"
+                                         onclick="showImageModal(this)">
+                                    <span class="menu-badge"><?= htmlspecialchars($data['nama']) ?></span>
                                 </div>
                                 <div class="card-body">
                                     <h3 class="menu-title"><?= htmlspecialchars($menu['nama_menu']) ?></h3>
@@ -349,8 +461,15 @@ $daftar_kategori = [
                             </div>
                         </div>
                     <?php endforeach; ?>
-                </div>
-            <?php endif; ?>
+                    
+                    <div class="col-12 text-center">
+                        <button class="show-more-btn" 
+                                onclick="toggleShowMore(this, '<?= $kategori_id ?>')">
+                            Tampilkan Lebih Banyak
+                        </button>
+                    </div>
+                <?php endif; ?>
+            </div>
         <?php endforeach; ?>
 
         <!-- Back Button -->
@@ -360,6 +479,21 @@ $daftar_kategori = [
             </button>
         </div>
     </main>
+
+    <!-- Image Modal -->
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-body text-center p-0">
+                    <img id="modalImage" src="" alt="" class="img-fluid">
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Add intersection observer for scroll animations
@@ -382,13 +516,25 @@ $daftar_kategori = [
                 observer.observe(element);
             });
         });
+
+        function showImageModal(imgElement) {
+            const modalImg = document.getElementById('modalImage');
+            modalImg.src = imgElement.src;
+            modalImg.alt = imgElement.alt;
+        }
+
+        function toggleShowMore(button, categoryId) {
+            const hiddenItems = document.querySelectorAll(`.menu-item.hidden[data-category="${categoryId}"]`);
+            const isShowingMore = button.textContent.includes('Lebih Banyak');
+            
+            if (isShowingMore) {
+                hiddenItems.forEach(item => item.classList.remove('hidden'));
+                button.textContent = 'Tampilkan Lebih Sedikit';
+            } else {
+                hiddenItems.forEach(item => item.classList.add('hidden'));
+                button.textContent = 'Tampilkan Lebih Banyak';
+            }
+        }
     </script>
-    <script>
-function showImageModal(imgElement) {
-    const modalImg = document.getElementById('modalImage');
-    modalImg.src = imgElement.src;
-    modalImg.alt = imgElement.alt;
-}
-</script>
 </body>
 </html>
