@@ -324,9 +324,14 @@ $daftar_kategori = [
                             <div class="card menu-card">
                                 <div class="menu-img-container">
                                     <img src="../admin_login/Assets/menu/<?= htmlspecialchars($menu['gambar']) ?>" 
-                                         class="menu-img" 
-                                         alt="<?= htmlspecialchars($menu['nama_menu']) ?>"
-                                         loading="lazy">
+     class="menu-img"
+     alt="<?= htmlspecialchars($menu['nama_menu']) ?>"
+     loading="lazy"
+     style="cursor: pointer;"
+     data-bs-toggle="modal"
+     data-bs-target="#imageModal"
+     onclick="showImageModal(this)">
+
                                     <span class="menu-badge"><?= htmlspecialchars($judul) ?></span>
                                 </div>
                                 <div class="card-body">
@@ -355,7 +360,6 @@ $daftar_kategori = [
             </button>
         </div>
     </main>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Add intersection observer for scroll animations
@@ -379,5 +383,12 @@ $daftar_kategori = [
             });
         });
     </script>
+    <script>
+function showImageModal(imgElement) {
+    const modalImg = document.getElementById('modalImage');
+    modalImg.src = imgElement.src;
+    modalImg.alt = imgElement.alt;
+}
+</script>
 </body>
 </html>

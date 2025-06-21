@@ -30,17 +30,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <input type="text" name="nama_menu" class="form-control" required>
     </div>
     <div class="mb-3">
-      <label>Kategori</label>
-      <select name="kategori" class="form-control" required>
-        <option value="ayam">Ayam</option>
-        <option value="ikan">Ikan</option>
-        <option value="bebek">Bebek</option>
-        <option value="kuah">Kuah</option>
-        <option value="sayur">Sayur</option>
-        <option value="minuman">Minuman</option>
-        <option value="tambahan">Menu Tambahan</option>
-        <!-- tambah sesuai kategori lain -->
-      </select>
+      <?php
+// Ambil kategori dari database
+$kategori_query = mysqli_query($conn, "SELECT * FROM kategori_menu");
+?>
+
+<select name="kategori" class="form-control" required>
+  <option value="">-- Pilih Kategori --</option>
+  <?php while ($kat = mysqli_fetch_assoc($kategori_query)): ?>
+    <option value="<?= htmlspecialchars($kat['nama_kategori']) ?>"
+      <?= isset($row['kategori']) && $row['kategori'] == $kat['nama_kategori'] ? 'selected' : '' ?>>
+      <?= htmlspecialchars($kat['nama_kategori']) ?>
+    </option>
+  <?php endwhile; ?>
+</select>
+
     </div>
     <div class="mb-3">
       <label>Gambar</label>

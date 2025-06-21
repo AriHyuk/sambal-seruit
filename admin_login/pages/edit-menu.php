@@ -34,16 +34,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <input type="text" name="nama_menu" class="form-control" value="<?= htmlspecialchars($data['nama_menu']) ?>" required>
     </div>
     <div class="mb-3">
-      <label>Kategori</label>
-      <select name="kategori" class="form-control" required>
-        <?php
-        $kategori = ['ayam','ikan','bebek','kuah','sayur','minuman','tambahan'];
-        foreach($kategori as $kat):
-          $selected = $kat == $data['kategori'] ? 'selected' : '';
-          echo "<option value='$kat' $selected>".ucwords($kat)."</option>";
-        endforeach;
-        ?>
-      </select>
+      <?php
+// Ambil kategori dari database
+$kategori_query = mysqli_query($conn, "SELECT * FROM kategori_menu");
+?>
+
+<select name="kategori" class="form-control" required>
+  <option value="">-- Pilih Kategori --</option>
+  <?php while ($kat = mysqli_fetch_assoc($kategori_query)): ?>
+    <option value="<?= htmlspecialchars($kat['nama_kategori']) ?>"
+      <?= isset($row['kategori']) && $row['kategori'] == $kat['nama_kategori'] ? 'selected' : '' ?>>
+      <?= htmlspecialchars($kat['nama_kategori']) ?>
+    </option>
+  <?php endwhile; ?>
+</select>
     </div>
     <div class="mb-3">
       <label>Gambar (biarkan kosong jika tidak diganti)</label><br>

@@ -12,6 +12,10 @@ $resultGaleri = mysqli_query($conn, "SELECT COUNT(*) as total FROM galeri");
 $dataGaleri = mysqli_fetch_assoc($resultGaleri);
 $totalGaleri = $dataGaleri['total'] ?? 0;
 
+$resultKategori = mysqli_query($conn, "SELECT COUNT(*) as total FROM kategori_menu");
+$dataKategori = mysqli_fetch_assoc($resultKategori);
+$totalKategori = $dataKategori['total'] ?? 0;
+
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -206,6 +210,9 @@ $totalGaleri = $dataGaleri['total'] ?? 0;
       <a href="dashboard-galeri.php" class="menu-item">
         <i class="bi bi-images"></i> Kelola Galeri
       </a>
+        <a href="dashboard-kategori.php" class="menu-item">
+        <i class="bi bi-images"></i> Kelola Kategori
+      </a>
       <a href="../proses/logout.php" class="menu-item">
         <i class="bi bi-box-arrow-right"></i> Logout
       </a>
@@ -259,6 +266,16 @@ $totalGaleri = $dataGaleri['total'] ?? 0;
             </div>
             <div class="count"><?= $totalGaleri ?></div>
             <div class="label">Foto Galeri</div>
+          </div>
+        </div>
+
+                <div class="col-md-6 col-lg-3">
+          <div class="stats-card">
+            <div class="icon">
+              <i class="bi bi-images"></i>
+            </div>
+            <div class="count"><?= $totalKategori ?></div>
+            <div class="label">Kategori</div>
           </div>
         </div>
         
